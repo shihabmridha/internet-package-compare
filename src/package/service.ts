@@ -15,7 +15,6 @@ export async function GetForGp(): Promise<Package[]> {
 
 export async function GetForRobi(): Promise<Package[]> {
     const data = await GetRobiData();
-    console.log(data);
     return data.filter(i => i.display_status).map((e, i) => {
         const pkg = new RobiPackage(i, e.title_en, e.price, Operators.ROBI);
         pkg.setValidity(e.duration / 24); // hours to days
