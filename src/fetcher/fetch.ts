@@ -11,7 +11,7 @@ function stringToDom(html: string): NodeListOf<ChildNode> {
 export async function GetRobiData(): Promise<RobiData[]> {
     const responses = await Promise.all(
         Array.from({ length: 10 }, (_, i) => {
-            return fetch(`https://webapi.robi.com.bd/v1/pages/personal/internet/internet-packs?page=${i}`);
+            return fetch(`${import.meta.env.VITE_ROBI_URL}${i}`);
         }),
     );
 
@@ -26,7 +26,7 @@ export async function GetRobiData(): Promise<RobiData[]> {
 
 
 export async function GetGpData(): Promise<GpData[]>{
-    const response = await fetch('/internet-packs');
+    const response = await fetch(import.meta.env.VITE_GRAMEENPHONE_URL);
     const htmlString = await response.text();
 
     const nodes = stringToDom(htmlString);
@@ -42,7 +42,7 @@ export async function GetGpData(): Promise<GpData[]>{
 }
 
 export async function GetBanglalinkData(): Promise<BanglalinkData[]> {
-    const response = await fetch('https://web-api.banglalink.net/api/v1/offers/prepaid/internet');
+    const response = await fetch(import.meta.env.VITE_BANGLALINK_URL);
     const json = await response.json();
     const data = json.data;
 
