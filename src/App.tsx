@@ -1,26 +1,25 @@
-import {useEffect} from "react";
-import {GetForGp, GetForRobi} from "./package/service.ts";
+import {useEffect, useState} from "react";
+import {GetForBanglalink, GetForGp, GetForRobi} from "./package/service.ts";
+import {PackageComparisonComponent} from "@/components/package-comparison.tsx";
+import {Package} from "@/package/package.ts";
 
 function App() {
-   useEffect( () => {
-       (async () => {
-           const [gp, robi] = await Promise.all([
-               GetForGp(),
-               GetForRobi(),
-           ]);
+    const [packages, setPackages] = useState<Package[]>([]);
 
-           console.log(gp);
-           console.log(robi);
-       })()
-   }, []);
+    useEffect(() => {
+        (async () => {
+            const [gp, robi, banglalink] = await Promise.all([
+                GetForGp(),
+                GetForRobi(),
+                GetForBanglalink(),
+            ]);
+            setPackages([...gp, ...robi, ...banglalink]);
+        })();
+    }, []);
 
     return (
-        <>
-            <div>
-                <h3>Shihab Mridha</h3>
-            </div>
-        </>
-    )
+        <PackageComparisonComponent packages={packages}/>
+    );
 }
 
-export default App
+export default App;

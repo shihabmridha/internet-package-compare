@@ -20,3 +20,14 @@ export interface GpData {
     bonusMin: string;
     nid: string;
 }
+
+export interface BanglalinkData {
+    id: number;
+   name_en: string;
+   price_tk: number;
+   validity_days: number;
+   validity_unit: string;
+   internet_volume_mb: number;
+   sms_volume: number;
+   minute_volume: number;
+}

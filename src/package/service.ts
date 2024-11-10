@@ -1,54 +1,37 @@
-import {GetGpData, GetRobiData} from "../fetcher/fetch.ts";
-import {Package} from "./model.ts";
-
-function isValidDate(value: string) {
-    const date = new Date(value);
-    return !isNaN(date.getTime());
-}
-
-function diffInDays(from: Date, to: Date) {
-    const oneDayInMs = 1000 * 60 * 60 * 24;
-    const fromMs = from.getTime();
-    const toMs = to.getTime();
-    const differenceInMs = Math.abs(toMs - fromMs);
-    return Math.floor(differenceInMs / oneDayInMs);
-}
-
-function gpValidity(value: string): number {
-    if (isValidDate(value)) {
-        return diffInDays(new Date(), new Date(value));
-    }
-
-    return Number(value.split(' ')[0]);
-}
+import {GetBanglalinkData, GetGpData, GetRobiData} from "../fetcher/fetch.ts";
+import {Operators} from "@/enums/operator.ts";
+import {BanglalinkPackage, GrameenphonePackage, Package, RobiPackage} from "@/package/package.ts";
 
 export async function GetForGp(): Promise<Package[]> {
     const data = await GetGpData();
     return data.map((e, i) => {
-        return {
-            id: i,
-            title: e.title,
-            subTitle: e.subTitle,
-            price: Number(e.price),
-            validity: gpValidity(e.timeDuration), // ex: 7 Days to 7
-            sms: 0,
+        const pkg = new GrameenphonePackage(i, e.title, +e.price, Operators.GP);
+        pkg.setVolume(e.title);
+        pkg.setValidity(e.timeDuration);
 
-        } as Package;
-    })
+        return pkg;
+    });
 }
 
-export async function GetForRobi() {
+export async function GetForRobi(): Promise<Package[]> {
     const data = await GetRobiData();
-    return data.map((e, i) => {
-        return {
-            id: i,
-            title: e.title_en,
-            subTitle: '',
-            price: Number(e.price),
-            validity: e.duration / 24, // hours to days
-            sms: e.sms,
-            talkTime: e.talk_time,
+    console.log(data);
+    return data.filter(i => i.display_status).map((e, i) => {
+        const pkg = new RobiPackage(i, e.title_en, e.price, Operators.ROBI);
+        pkg.setValidity(e.duration / 24); // hours to days
+        pkg.setVolume(e.volume);
 
-        } as Package;
-    })
+        return pkg;
+    });
+}
+
+export async function GetForBanglalink(): Promise<Package[]> {
+    const data = await GetBanglalinkData();
+    return data.map((e, i) => {
+        const pkg = new BanglalinkPackage(i, e.name_en, e.price_tk, Operators.BANGLALINK);
+        pkg.setValidity(e.validity_days);
+        pkg.setVolume(e.internet_volume_mb);
+
+        return pkg;
+    });
 }

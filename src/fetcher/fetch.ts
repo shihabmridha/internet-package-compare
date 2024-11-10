@@ -1,4 +1,4 @@
-import {GpData, RobiData} from "./types.ts";
+import {BanglalinkData, GpData, RobiData} from "./types.ts";
 
 function stringToDom(html: string): NodeListOf<ChildNode> {
     const template = document.createElement('template');
@@ -39,4 +39,12 @@ export async function GetGpData(): Promise<GpData[]>{
     }
 
     return json?.props?.pageProps?.internet_package_card_data?.content as GpData[];
+}
+
+export async function GetBanglalinkData(): Promise<BanglalinkData[]> {
+    const response = await fetch('https://web-api.banglalink.net/api/v1/offers/prepaid/internet');
+    const json = await response.json();
+    const data = json.data;
+
+    return data.filter((i: { type: string; }) => i.type === 'all')[0].packs as BanglalinkData[];
 }
