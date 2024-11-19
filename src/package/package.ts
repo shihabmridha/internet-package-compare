@@ -4,7 +4,6 @@ import {diffInDays, isValidDate} from "@/lib/utils.ts";
 export interface Package {
     id: number;
     title: string;
-    subTitle: string;
     price: number;
     validity: number; // in days
     volume: number;
@@ -14,6 +13,7 @@ export interface Package {
     sms: number;
     bonusSms: number;
     operator: Operators;
+    description?: string;
 }
 
 abstract class BasePackage implements Package {
@@ -28,7 +28,6 @@ abstract class BasePackage implements Package {
     sms = 0;
     bonusSms = 0;
     title: string;
-    subTitle = '';
 
     constructor(id: number, title: string, price: number, operator: Operators) {
         this.id = id;

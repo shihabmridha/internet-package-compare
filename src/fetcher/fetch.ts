@@ -24,7 +24,6 @@ export async function GetRobiData(): Promise<RobiData[]> {
     return jsons.map(e => e.data.data.items.data).filter(i => i !== undefined).flat() as RobiData[];
 }
 
-
 export async function GetGpData(): Promise<GpData[]>{
     const response = await fetch(import.meta.env.VITE_GRAMEENPHONE_URL);
     const htmlString = await response.text();
