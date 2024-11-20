@@ -39,7 +39,6 @@ interface SortState {
 
 export function PackageComparisonComponent({packages}: PackageProps) {
   const [primarySort, setPrimarySort] = useState<SortState>({field: 'price', order: 'asc'});
-  const [secondarySort, setSecondarySort] = useState<SortState | null>(null);
   const [filterValidity, setFilterValidity] = useState<string>("all");
   const [filterOperator, setFilterOperator] = useState<string>("all");
   const [aiPrompt, setAiPrompt] = useState<string>("");
@@ -48,7 +47,7 @@ export function PackageComparisonComponent({packages}: PackageProps) {
   const [operators, setOperators] = useState<Set<Operators>>();
   const [assistantService, setAssistantService] = useState<AssistantService | null>(null);
   const [aiResult, setAiResult] = useState<string>("<p>Let AI help you find the best mobile internet package for your needs.</p>");
-  const [aiSubmitButtonDisabled, setAiSubmitButtonDisabled] = useState<boolean>(false);
+  const [modalButtonStatus, setModalButtonStatus] = useState<boolean>(false);
 
   useEffect(() => {
     const assistant = new AssistantService();
@@ -79,15 +78,6 @@ export function PackageComparisonComponent({packages}: PackageProps) {
     return [];
   };
 
-  const handleSort = (field: SortField) => {
-    if (field === primarySort.field) {
-      setPrimarySort(prev => ({...prev, order: prev.order === 'asc' ? 'desc' : 'asc'}));
-    } else if (field === secondarySort?.field) {
-      setSecondarySort(prev => prev ? {...prev, order: prev.order === 'asc' ? 'desc' : 'asc'} : null);
-    } else if (secondarySort === null || field !== secondarySort.field) {
-      setSecondarySort({field, order: 'asc'});
-    }
-  };
 
   const filteredAndSortedPackages = useMemo(() => {
     return [...packages]
@@ -100,25 +90,16 @@ export function PackageComparisonComponent({packages}: PackageProps) {
           if (a[primarySort.field] < b[primarySort.field]) return primarySort.order === 'asc' ? -1 : 1;
           if (a[primarySort.field] > b[primarySort.field]) return primarySort.order === 'asc' ? 1 : -1;
 
-          // Secondary sort
-          if (secondarySort) {
-            if (a[secondarySort.field] < b[secondarySort.field]) return secondarySort.order === 'asc' ? -1 : 1;
-            if (a[secondarySort.field] > b[secondarySort.field]) return secondarySort.order === 'asc' ? 1 : -1;
-          }
-
           return 0;
         });
-  }, [packages, primarySort, secondarySort, filterValidity, filterOperator]);
+  }, [packages, primarySort, filterValidity, filterOperator]);
 
   const SortIcon = ({field}: { field: SortField }) => {
     if (field === primarySort.field) {
       return primarySort.order === 'asc' ? <ChevronUp className="ml-2 h-4 w-4"/> :
           <ChevronDown className="ml-2 h-4 w-4"/>;
     }
-    if (field === secondarySort?.field) {
-      return secondarySort.order === 'asc' ? <ChevronUp className="ml-2 h-4 w-4"/> :
-          <ChevronDown className="ml-2 h-4 w-4"/>;
-    }
+
     return null;
   };
 
@@ -128,12 +109,16 @@ export function PackageComparisonComponent({packages}: PackageProps) {
     setIsApiKeyModalOpen(false);
   };
 
-  const submitAiPrompt = async (prompt: string) => {
-    setAiSubmitButtonDisabled(true);
+  const handleSort = (field: SortField) => {
+    setPrimarySort(prev => ({...prev, field: field, order: prev.order === 'asc' ? 'desc' : 'asc'}));
+  };
+
+  const handleSubmitAiPrompt = async (prompt: string) => {
+    setModalButtonStatus(true);
     setAiResult("<p>Thinking...</p>");
     const response = await assistantService?.getSuggestion(prompt, filteredAndSortedPackages);
     setAiResult(response ?? "<p>Sorry, there was an error processing your query.</p>");
-    setAiSubmitButtonDisabled(false);
+    setModalButtonStatus(false);
   };
 
   return (
@@ -191,11 +176,11 @@ export function PackageComparisonComponent({packages}: PackageProps) {
                 {<div dangerouslySetInnerHTML={{__html: aiResult}} />}
 
                 <Button onClick={async () => {
-                  await submitAiPrompt(aiPrompt);
-                }} disabled={aiSubmitButtonDisabled}>
+                  await handleSubmitAiPrompt(aiPrompt);
+                }} disabled={modalButtonStatus}>
                   Submit
                 </Button>
-                <Button variant="outline" onClick={() => setIsApiKeyModalOpen(true)}>
+                <Button variant="outline" disabled={modalButtonStatus} onClick={() => setIsApiKeyModalOpen(true)}>
                   Set Gemini API Key
                 </Button>
               </div>

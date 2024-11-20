@@ -96,6 +96,10 @@ export class AssistantService {
     }
 
     async getSuggestion(userQuery: string, packages: Package[]) {
+        if (!this.apiKey || this.apiKey === '') {
+            return 'API key not found';
+        }
+
         const prompt = this.getPrompt(packages, userQuery);
         return this.genAI?.query(prompt);
     }
