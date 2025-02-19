@@ -106,6 +106,7 @@ export function PackageComparisonComponent({packages}: PackageProps) {
   const handleSaveApiKey = () => {
     assistantService?.clearApiKey();
     assistantService?.setApiKey(geminiApiKey);
+    setGeminiApiKey(geminiApiKey);
     setIsApiKeyModalOpen(false);
   };
 
@@ -116,7 +117,9 @@ export function PackageComparisonComponent({packages}: PackageProps) {
   const handleSubmitAiPrompt = async (prompt: string) => {
     setModalButtonStatus(true);
     setAiResult("<p>Thinking...</p>");
-    const response = await assistantService?.getSuggestion(prompt, filteredAndSortedPackages);
+    let response = await assistantService?.getSuggestion(prompt, filteredAndSortedPackages);
+    response = response?.replace(/```html/g, '').replace(/```/g, '');
+
     setAiResult(response ?? "<p>Sorry, there was an error processing your query.</p>");
     setModalButtonStatus(false);
   };

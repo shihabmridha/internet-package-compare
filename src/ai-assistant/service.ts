@@ -73,7 +73,7 @@ export class AssistantService {
         - Explanation:
         
         Provide clear recommendation and shortly explanation of your recommendation. Also explain why not other option.
-        You must give the response in HTML format without head and body tag.
+        You must give the response in HTML format without head and body tag and
         `;
     }
 
