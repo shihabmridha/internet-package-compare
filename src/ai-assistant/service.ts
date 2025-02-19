@@ -61,7 +61,7 @@ export class AssistantService {
         Consider factors like:
         - There are packages with unlimited data
         - There are packages with unlimited validity (but actually 10 years)
-        - Important consideration that some packages are specific social media and other websites can not be used
+        - Important: some packages are specific social media and other websites can not be used
         - Total data volume (including bonus)
         - Validity period
         - Internet volume gets priority over additional benefits

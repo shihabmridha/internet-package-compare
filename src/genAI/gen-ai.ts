@@ -12,7 +12,7 @@ export class GenerativeAI implements AiAssistant {
 
         try {
             this.genAI = new GoogleGenerativeAI(apiKey);
-            this.model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+            this.model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
             return true;
         } catch (error) {
             console.error('Error initializing Gemini AI:', error);
